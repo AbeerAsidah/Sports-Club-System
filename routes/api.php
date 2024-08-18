@@ -8,6 +8,12 @@ use App\Http\Controllers\RoomController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\FacilityController;
+use App\Http\Controllers\SubscriptionController;
+use App\Http\Controllers\OfferController;
+use App\Http\Controllers\PaymentController;
+
+
+
 
 
 // Routes for sport images
@@ -64,8 +70,8 @@ Route::prefix('rooms')->group(function () {
 
 Route::prefix('categories')->group(function () {
     Route::get('/', [CategoryController::class, 'index']);
-    Route::post('/', [CategoryController::class, 'store']);
     Route::get('{category}', [CategoryController::class, 'show']);
+    Route::post('/', [CategoryController::class, 'store']);
     Route::post('{category}', [CategoryController::class, 'update']);
     Route::post('delete/{category}', [CategoryController::class, 'destroy']);
 });
@@ -78,3 +84,32 @@ Route::prefix('articles')->group(function () {
     Route::post('{article}', [ArticleController::class, 'update']);
     Route::post('delete/{article}', [ArticleController::class, 'destroy']);
 });
+
+
+
+Route::prefix('subscriptions')->group(function () {
+    Route::post('/', [SubscriptionController::class, 'store']); 
+    Route::put('{id}/renew', [SubscriptionController::class, 'renew']); 
+    Route::put('{id}/suspend', [SubscriptionController::class, 'suspend']); 
+    Route::get('/', [SubscriptionController::class, 'index']); 
+    Route::get('{id}', [SubscriptionController::class, 'show']); 
+});
+
+Route::prefix('offers')->group(function () {
+    Route::post('/', [OfferController::class, 'store']); 
+    Route::put('{id}', [OfferController::class, 'update']);
+    Route::delete('{id}', [OfferController::class, 'destroy']); 
+    Route::get('/', [OfferController::class, 'index']); 
+    Route::get('{id}', [OfferController::class, 'show']); 
+});
+
+
+Route::prefix('payments')->group(function () {
+    Route::post('/', [PaymentController::class, 'store']); 
+    Route::get('/', [PaymentController::class, 'index']); 
+    Route::get('{id}', [PaymentController::class, 'show']); 
+});
+Route::get('/subscriptions/{id}/payments', [PaymentController::class, 'getPaymentsBySubscription']);
+
+
+
