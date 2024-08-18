@@ -5,7 +5,8 @@ use App\Http\Controllers\SportImageController;
 use App\Http\Controllers\SportVideoController;
 use App\Http\Controllers\SportController;
 use App\Http\Controllers\RoomController;
-
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\FacilityController;
 
 
@@ -58,4 +59,22 @@ Route::prefix('rooms')->group(function () {
     Route::get('{room}', [RoomController::class, 'show']);
     Route::post('{room}', [RoomController::class, 'update']);
     Route::post('delete/{room}', [RoomController::class, 'destroy']);
+});
+
+
+Route::prefix('categories')->group(function () {
+    Route::get('/', [CategoryController::class, 'index']);
+    Route::post('/', [CategoryController::class, 'store']);
+    Route::get('{category}', [CategoryController::class, 'show']);
+    Route::post('{category}', [CategoryController::class, 'update']);
+    Route::post('delete/{category}', [CategoryController::class, 'destroy']);
+});
+
+Route::prefix('articles')->group(function () {
+    Route::get('/', [ArticleController::class, 'index']);
+    Route::get('category/{id}', [ArticleController::class, 'articlesByCategory']);
+    Route::post('/', [ArticleController::class, 'store']);
+    Route::get('{article}', [ArticleController::class, 'show']);
+    Route::post('{article}', [ArticleController::class, 'update']);
+    Route::post('delete/{article}', [ArticleController::class, 'destroy']);
 });
