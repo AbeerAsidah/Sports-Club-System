@@ -9,15 +9,10 @@ class Room extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'sport_id', 'facility_id'];
+    protected $fillable = ['name', 'description',  'sport_id'];
 
     public function sport()
     {
         return $this->belongsTo(Sport::class);
-    }
-
-    public function facility()
-    {
-        return $this->belongsTo(Facility::class);
     }
 }

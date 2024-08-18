@@ -9,7 +9,7 @@ class Facility extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'type', 'is_shared'];
+    protected $fillable = ['name', 'description' ];
 
     public function sports()
     {

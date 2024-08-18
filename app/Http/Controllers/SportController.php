@@ -33,29 +33,50 @@ class SportController extends Controller
 
     }
 
-    public function show(Sport $sport)
+    public function show( $id)
     {
-        if($sport){
-            return $this->apiResponse($sport , 'ok' ,200);
+        $sport = Sport::find($id);
+
+        if ($sport) {
+            return $this->apiResponse($sport, 'ok', 200);
         }
-        return $this->apiResponse(null ,'the sport not found' ,404);
+
+        return $this->apiResponse(null, 'The sport not found', 404);
     }
 
-    public function update(Request $request, Sport $sport)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'schedule' => 'required|json',
-        ]);
 
+    public function update(Request $request, $id)
+    {
+        // $request->validate([
+        //     'name' => 'required|string|max:255',
+        //     'description' => 'nullable|string',
+        //     'schedule' => 'required|json',
+        // ]);
+    
+        $sport = Sport::find($id);
+    
+        if (!$sport) {
+            return $this->apiResponse(null, 'Sport not found', 404);
+        }
+    
         $sport->update($request->all());
-        return $this->apiResponse($sport, 'Sport updated successfully');
+    
+        return $this->apiResponse($sport, 'Sport updated successfully',200);
     }
-
-    public function destroy(Sport $sport)
+    
+    public function destroy($id)
     {
-        $sport->delete();
-        return $this->apiResponse(null, 'Sport deleted successfully', 204);
+        $sport = Sport::find($id);
+    
+        if (!$sport) {
+            return $this->apiResponse(null, 'Sport not found', 404);
+        }
+    
+        // $sport->delete();
+
+        // return $this->apiResponse(null, 'Sport deleted successfully', 204);
+        $sport->delete($id);
+        if($sport)
+            return $this->apiResponse(null ,'the  sport delete ',200);
     }
-}
+}    

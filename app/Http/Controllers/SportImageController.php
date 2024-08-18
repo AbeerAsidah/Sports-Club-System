@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Models\SportImage;
-use App\Traits\ApiResponseTrait;
+use App\Models\Sport;
 use Illuminate\Http\Request;
+use App\Traits\ApiResponseTrait;
 use Illuminate\Support\Facades\Storage;
 
 class SportImageController extends Controller
@@ -15,53 +15,119 @@ class SportImageController extends Controller
     public function index()
     {
         $images = SportImage::all();
-        return $this->apiResponse($images, 'Images retrieved successfully');
+        return $this->apiResponse($images, 'ok', 200);
     }
 
-    public function store(Request $request)
+    // public function store(Request $request)
+    // {
+    //     $request->validate([
+    //         'sport_id' => 'required|exists:sports,id',
+    //         'image' => 'required|image|max:2048',
+    //     ]);
+
+    //     // $path = $request->file('image')->store('sport_images', 'public');
+    //     $path=$this->saveImage($request->image,'images/sport');
+
+    //     $image = SportImage::create([
+    //         'sport_id' => $request->sport_id,
+    //         'image_path' => $path,
+    //     ]);
+
+    //     if ($image) {
+    //         return $this->apiResponse($image, 'Image uploaded successfully', 201);
+    //     }
+    //     return $this->apiResponse(null, 'Image not uploaded', 400);
+    // }
+
+    public function store(Request $request, $sportId)
     {
         $request->validate([
-            'sport_id' => 'required|exists:sports,id',
             'image' => 'required|image|max:2048',
         ]);
 
-        
-        // $path = $request->file('image')->store('sport_images', 'public');
-        
-        $path=$this->saveImage($request->image,'images/sport');
+        $sport = Sport::find($sportId);
+        if (!$sport) {
+            return $this->apiResponse(null, 'Sport not found', 404);
+        }
 
-        $image = SportImage::create([
-            'sport_id' => $request->sport_id,
-            'image_path' => $path,
-        ]);
+        try {
+            $path=$this->saveImage($request->image,'images/sport');
 
-        return $this->apiResponse($image, 'Image created successfully', 201);
+            if (!$path) {
+                return $this->apiResponse(null, 'Failed to store image', 500);
+            }
+
+            $image = SportImage::create([
+                'sport_id' => $sportId,
+                'image_path' => $path,
+            ]);
+
+            if (!$image) {
+                return $this->apiResponse(null, 'Failed to create image record', 500);
+            }
+
+            return $this->apiResponse($image, 'Image created successfully', 201);
+
+        } catch (\Exception $e) {
+            
+            return $this->apiResponse(null, 'An error occurred while storing the image', 500);
+        }
     }
 
-
-    public function show(SportImage $sportImage)
+    public function show($id)
     {
-        return $this->apiResponse($sportImage, 'Image retrieved successfully');
+        $sportImage = SportImage::find($id);
+
+        if ($sportImage) {
+            return $this->apiResponse($sportImage, 'Image retrieved successfully', 200);
+        }
+
+        return $this->apiResponse(null, 'Image not found', 404);
     }
 
-    public function update(Request $request, SportImage $sportImage)
+    public function update(Request $request, $id)
     {
-        $request->validate([
-            'image' => 'nullable|image|max:2048',
-        ]);
+        $sportImage = SportImage::find($id);
+
+        if (!$sportImage) {
+            return $this->apiResponse(null, 'Image not found', 404);
+        }
 
         if ($request->hasFile('image')) {
             Storage::disk('public')->delete($sportImage->image_path);
-            $path = $request->file('image')->store('sport_images', 'public');
+            $path=$this->saveImage($request->image,'images/sport');
             $sportImage->update(['image_path' => $path]);
         }
 
-        return $this->apiResponse($sportImage, 'Image updated successfully');
+        return $this->apiResponse($sportImage, 'Image updated successfully', 200);
     }
 
-    public function destroy(SportImage $sportImage)
+    public function destroy($id)
     {
+        $sportImage = SportImage::find($id);
+
+        if (!$sportImage) {
+            return $this->apiResponse(null, 'Image not found', 404);
+        }
+
         Storage::disk('public')->delete($sportImage->image_path);
         $sportImage->delete();
-        return $this->apiResponse(null, 'Image deleted successfully', 204);
-    }}
+
+        return $this->apiResponse(null, 'Image deleted successfully', 200);
+    }
+
+    public function imagesBySport($sportId)
+    {
+        $sport = Sport::find($sportId);
+
+        if (!$sport) {
+            return $this->apiResponse(null, 'Sport not found', 404);
+        }
+
+        $images = $sport->images; 
+        if ($images->isEmpty()) {
+            return $this->apiResponse(null, 'No images found for this sport', 404);
+        }
+        return $this->apiResponse($images, 'Images retrieved successfully', 200);
+    }
+}

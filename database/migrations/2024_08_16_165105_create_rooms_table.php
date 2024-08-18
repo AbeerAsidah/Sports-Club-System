@@ -13,6 +13,10 @@ return new class extends Migration
     {
         Schema::create('rooms', function (Blueprint $table) {
             $table->id();
+            $table->string('name');
+            $table->text('description')->nullable();
+            // $table->boolean('is_shared')->default(false);
+            $table->foreignId('sport_id')->constrained('sports','id')->onDelete('cascade');
             $table->timestamps();
         });
     }
