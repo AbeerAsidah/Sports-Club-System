@@ -110,6 +110,7 @@ Route::prefix('payments')->group(function () {
     Route::get('{id}', [PaymentController::class, 'show']); 
 });
 Route::get('/subscriptions/{id}/payments', [PaymentController::class, 'getPaymentsBySubscription']);
+Route::get('/articles/tag/{tagName}', [ArticleController::class, 'articlesByTagName']);
 
 
 

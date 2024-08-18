@@ -104,10 +104,8 @@
         document.getElementById('subscriptionForm').addEventListener('submit', function(event) {
             event.preventDefault();
 
-            // Gather form data
             const formData = new FormData(this);
 
-            // Prepare data for API
             const data = {
                 name: formData.get('name'),
                 email: formData.get('email'),
@@ -116,7 +114,6 @@
                 subscription_type: formData.get('subscription_type')
             };
 
-            // Send data to server using fetch API
             fetch('/api/subscriptions', {
                 method: 'POST',
                 headers: {
